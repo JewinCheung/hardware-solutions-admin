@@ -6,3 +6,19 @@ export const getTableData = () => {
     method: 'get'
   })
 }
+
+export const getProLine = () => {
+  return axios.request({
+    url: 'getProLine',
+    method: 'get'
+  })
+}
+
+
+export const getHardType = () => {
+  return axios.request({
+    url: 'getHardType',
+    method: 'get'
+  })
+}
+

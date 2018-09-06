@@ -9,19 +9,17 @@
       </div>
       <div class="tag-nav-line">
         产品线：
-        <Tag v-for="item in columns" :key="`tag-nav-${item.title}`" :name="item.title" :color="item.title === tag_name ? 'primary' : 'default'"
-          @click.native="tagClick(item.title)">{{ item.title }}</Tag>
+        <Tag v-for="item in ProLine" :key="item" :name="item" :color="item === tag_name ? 'primary' : 'default'" @click.native="tagClick(item)">{{ item}}</Tag>
       </div>
       <div class="tag-nav-line">
         硬件分类：
-        <Select v-model="model1" style="width:160px">
-          <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        <Select v-model="bigType" style="width:160px" @on-change="getSmall">
+          <Option v-for="item in HardType" :value="item.bigType" :key="item.bigType">{{ item.bigType }}</Option>
         </Select>
-        <Tag v-for="item in columnsT" :key="`tag-nav-${item.title}`" :name="item.title" color="default" >{{ item.title }}</Tag>
+        <Tag v-for="item in smallType" :key="`tag-nav-${item}`" :name="item" color="default" @click.native="tagAdd(item)">{{ item }}</Tag>
       </div>
       <div>
-         <Tag closable  v-for="item in columns" :key="`tag-nav-${item.title}`" :name="item.title" color="warning"
-          >{{ item.title }}</Tag>
+        <Tag closable v-for="item in tagCount" :key="item" :name="item.title" color="warning" closable @on-close="tagClose(item)">{{ item}}</Tag>
       </div>
     </Card>
   </div>
@@ -30,7 +28,8 @@
 <script>
   import Tables from '_c/tables'
   import {
-    getTableData
+    getProLine,
+    getHardType
   } from '@/api/data'
   export default {
     name: 'sales-hard-query',
@@ -39,102 +38,68 @@
     },
     data() {
       return {
-        columns: [{
-            title: '麻醉5.0',
-            key: '麻醉5.0',
-          },
-          {
-            title: 'ICU5.0',
-            key: 'ICU5.0',
-          },
-          {
-            title: '麻醉一体机',
-            key: '麻醉一体机'
-          },
-          {
-            title: 'ICU6.0',
-            key: 'ICU6.0'
-          },
-          {
-            title: 'WiiCare1.0',
-            key: 'WiiCare1.0'
-          },
-          {
-            title: '急诊急救',
-            key: '急诊急救'
-          },
-          {
-            title: '数字化',
-            key: '数字化'
-          }
-        ],
-        tableData: [],
+        ProLine: [],
+        HardType: [],
+        smallType: [],
         tag_name: "default",
-        cityList: [{
-            value: '服务器',
-            label: '服务器'
-          },
-          {
-            value: '电脑',
-            label: '电脑'
-          },
-          {
-            value: '电视机',
-            label: '电视机'
-          },
-          {
-            value: '打印机',
-            label: '打印机'
-          },
-          {
-            value: '推车',
-            label: '推车'
-          },
-          {
-            value: '支架',
-            label: '支架'
-          },
-          {
-            value: '扫描枪',
-            label: '扫描枪'
-          }
-        ],
-        model1: '电脑',
-             columnsT: [{
-            title: '台式机',
-            key: '台式机',
-          },
-          {
-            title: '笔记本',
-            key: '笔记本',
-          },
-          {
-            title: '一体机',
-            key: '一体机'
-          },
-          {
-            title: '瘦客户机',
-            key: '瘦客户机'
-          },
-          {
-            title: '平板电脑',
-            key: '平板电脑'
-          }
-        ],
-        tagCount:[]
+        bigType: '电脑',
+        tagCount: [],
       }
     },
     methods: {
+
+      getsmallType() {
+        const bigTypeName = this.bigType;
+
+        const HardType = this.HardType.filter((item) => {
+          return item.bigType == bigTypeName
+        })
+
+        setTimeout(() => {
+          this.smallType = HardType[0].smallType;
+        }, 300)
+
+
+      },
+
       tagClick(name) {
         this.tag_name = name;
+        this.tagAdd(name);
+      },
+      tagAdd(name) {
+        const index = this.tagCount.indexOf(name);
+        if (index < 0) {
 
+          this.tagCount.push(name);
+
+        }
+      },
+      tagClose(name) {
+
+        const index = this.tagCount.indexOf(name);
+        this.tagCount.splice(index, 1);
+
+      },
+      getSmall(Option) {
+        this.bigType = Option;
+        this.smallType = [];
+        this.getsmallType();
       }
 
     },
     mounted() {
-      getTableData().then(res => {
-        this.tableData = res.data
+      getProLine().then(res => {
+        this.ProLine = res.data;
+        const Line = this.ProLine[0];
+        this.tag_name = Line;
+        this.tagClick(Line);
+      });
+      getHardType().then(res => {
+        this.HardType = res.data
+        this.getsmallType();
+
       })
+
     }
   }
 
@@ -142,7 +107,7 @@
 
 <style lang="less">
   .sales-hard-query {
-    .search-con{
+    .search-con {
 
       padding: 0 0 10px 0;
     }
