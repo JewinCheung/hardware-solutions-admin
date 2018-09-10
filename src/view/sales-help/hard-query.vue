@@ -38,16 +38,17 @@
     },
     data() {
       return {
-        ProLine: [],
-        HardType: [],
-        smallType: [],
-        tag_name: "default",
-        bigType: '电脑',
+        ProLine: [],//产品线
+        HardType: [],//硬件分类
+        smallType: [],//硬件小类
+        tag_name: "default",//默认标签
+        bigType: '',//模式大类
         tagCount: [],
       }
     },
     methods: {
 
+      //切换硬件小分类
       getsmallType() {
         const bigTypeName = this.bigType;
 
@@ -61,11 +62,12 @@
 
 
       },
-
+      //标签点击事件
       tagClick(name) {
         this.tag_name = name;
         this.tagAdd(name);
       },
+      //添加标签
       tagAdd(name) {
         const index = this.tagCount.indexOf(name);
         if (index < 0) {
@@ -74,12 +76,14 @@
 
         }
       },
+      //关闭标签
       tagClose(name) {
 
         const index = this.tagCount.indexOf(name);
         this.tagCount.splice(index, 1);
 
       },
+      //硬件大分类选择事件
       getSmall(Option) {
         this.bigType = Option;
         this.smallType = [];
@@ -88,14 +92,17 @@
 
     },
     mounted() {
+      //初始化产品线
       getProLine().then(res => {
         this.ProLine = res.data;
         const Line = this.ProLine[0];
         this.tag_name = Line;
         this.tagClick(Line);
       });
+      //初始化硬件分类
       getHardType().then(res => {
         this.HardType = res.data
+        this.bigType= this.HardType[0].bigType;
         this.getsmallType();
 
       })
