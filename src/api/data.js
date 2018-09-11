@@ -22,3 +22,12 @@ export const getHardType = () => {
   })
 }
 
+export const getHardList = () => {
+  return axios.request({
+    url: 'getHardList',
+    method: 'get'
+  })
+}
+
+
+

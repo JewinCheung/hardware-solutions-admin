@@ -1,6 +1,6 @@
 import Mock from 'mockjs'
 import { login, logout, getUserInfo } from './login'
-import { getTableData,getProLine,getHardType } from './data'
+import { getTableData,getProLine,getHardType,getHardList } from './data'
 
 // 登录相关和获取用户信息
 Mock.mock(/\/login/, login)
@@ -9,6 +9,6 @@ Mock.mock(/\/logout/, logout)
 Mock.mock(/\/get_table_data/, getTableData)
 Mock.mock(/\/getProLine/, getProLine)
 Mock.mock(/\/getHardType/, getHardType)
-
+Mock.mock(/\/getHardList/, getHardList)
 
 export default Mock
