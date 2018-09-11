@@ -28,7 +28,6 @@ export const getProLine = req => {
   }
 }
 
-
 export const getHardType = req => {
   let HardType = [{
     bigType: '服务器',
@@ -48,14 +47,13 @@ export const getHardType = req => {
   }, {
     bigType: '支架',
     smallType: ['支架']
-  }, ]
+  } ]
   return {
     code: 200,
     data: HardType,
     msg: ''
   }
 }
-
 
 export const getHardList = req => {
   let HardList = [{
@@ -86,13 +84,13 @@ export const getHardList = req => {
       dictType: '导轨',
       dictName: '2U 滑轨'
     }],
-    hardWarranty:'2',
-    warrantyType:'上门',
-    warrantyPrice:'300',
-    hardImg:'',
-    IsEnergy:1,
-    hardPrice:'4000',
-    CreateTime:'2018-08-08'
+    hardWarranty: '2',
+    warrantyType: '上门',
+    warrantyPrice: '300',
+    hardImg: '',
+    IsEnergy: 1,
+    hardPrice: '4000',
+    CreateTime: '2018-08-08'
   }, {
     proLineName: '麻醉',
     bigType: '服务器',
@@ -121,16 +119,16 @@ export const getHardList = req => {
       dictType: '导轨',
       dictName: '2U 滑轨'
     }],
-    hardWarranty:'2',
-    warrantyType:'上门',
-    warrantyPrice:'300',
-    hardImg:['http://image.tianjimedia.com/uploadImages/2018/220/20180806230936225001.jpg','http://img.pconline.com.cn/images/product/6246/624662/Z.jpg'],
-    IsEnergy:1,
-    hardPrice:'4000',
-    CreateTime:'2018-08-08'
+    hardWarranty: '2',
+    warrantyType: '上门',
+    warrantyPrice: '300',
+    hardImg: ['http://image.tianjimedia.com/uploadImages/2018/220/20180806230936225001.jpg', 'http://img.pconline.com.cn/images/product/6246/624662/Z.jpg'],
+    IsEnergy: 1,
+    hardPrice: '4000',
+    CreateTime: '2018-08-08'
   },
   {
-    proLineName: '麻醉',
+    proLineName: '重症',
     bigType: '电脑',
     smallType: '台式机',
     hardBrand: '惠普',
@@ -157,14 +155,14 @@ export const getHardList = req => {
       dictType: '显示器',
       dictName: '9.5"宽屏液晶 1600x900'
     }],
-    hardWarranty:'2',
-    warrantyType:'上门',
-    warrantyPrice:'300',
-    hardImg:'',
-    IsEnergy:0,
-    hardPrice:'4000',
-    CreateTime:'2018-08-08'
-  },]
+    hardWarranty: '2',
+    warrantyType: '上门',
+    warrantyPrice: '300',
+    hardImg: '',
+    IsEnergy: 0,
+    hardPrice: '4000',
+    CreateTime: '2018-08-08'
+  }]
   return {
     code: 200,
     data: HardList,

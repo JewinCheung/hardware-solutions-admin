@@ -57,7 +57,7 @@ export default [
         name: 'sales-hard-query',
         meta: {
           icon: 'md-trending-up',
-          title: '硬件库查询'
+          title: '销售-硬件库查询'
         },
         component: () => import('@/view/sales-help/hard-query.vue')
       },
@@ -66,7 +66,7 @@ export default [
         name: 'sales-information-feedback',
         meta: {
           icon: 'md-grid',
-          title: '现场信息反馈'
+          title: '销售-现场信息反馈'
         },
         component: () => import('@/view/sales-help/information-feedback.vue')
       }
@@ -86,7 +86,7 @@ export default [
         name: 'product-hard-query',
         meta: {
           icon: 'md-trending-up',
-          title: '硬件库查询'
+          title: '产品-硬件库查询'
         },
         component: () => import('@/view/product-help/hard-query.vue')
       },
@@ -95,7 +95,7 @@ export default [
         name: 'product-information-feedback',
         meta: {
           icon: 'md-grid',
-          title: '现场信息反馈'
+          title: '产品-现场信息反馈'
         },
         component: () => import('@/view/product-help/information-feedback.vue')
       }
@@ -116,7 +116,7 @@ export default [
         name: 'purchasing-hard-query',
         meta: {
           icon: 'md-trending-up',
-          title: '硬件库查询'
+          title: '采购-硬件库查询'
         },
         component: () => import('@/view/purchasing-help/hard-query.vue')
       },
@@ -125,7 +125,7 @@ export default [
         name: 'purchasing-information-feedback',
         meta: {
           icon: 'md-grid',
-          title: '现场信息反馈'
+          title: '采购-现场信息反馈'
         },
         component: () => import('@/view/purchasing-help/information-feedback.vue')
       }
