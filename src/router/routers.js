@@ -128,7 +128,27 @@ export default [
           title: '采购-现场信息反馈'
         },
         component: () => import('@/view/purchasing-help/information-feedback.vue')
+      },
+      {
+        path: '/proline-manage',
+        name: 'proline-manage',
+        meta: {
+          icon: 'md-grid',
+          title: '产品线维护'
+        },
+        component: () => import('@/view/purchasing-help/proline-manage.vue')
+      },
+      {
+        path: '/hard-type-manahe',
+        name: 'hard-type-manahe',
+        meta: {
+          icon: 'md-grid',
+          title: '硬件分类维护'
+        },
+        component: () => import('@/view/purchasing-help/hard-type-manahe.vue')
       }
+
+      
 
     ]
   },
