@@ -29,5 +29,15 @@ export const getHardList = () => {
   })
 }
 
+export const getInfoList = () => {
+  return axios.request({
+    url: 'getInfoList',
+    method: 'get'
+  })
+}
+
+
+
+
 
 

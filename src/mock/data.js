@@ -5,7 +5,7 @@ import {
 
 export const getTableData = req => {
   let tableData = []
-  doCustomTimes(5, () => {
+  doCustomTimes(5, (i) => {
     tableData.push(Mock.mock({
       name: '@name',
       email: '@email',
@@ -166,6 +166,33 @@ export const getHardList = req => {
   return {
     code: 200,
     data: HardList,
+    msg: ''
+  }
+}
+
+export const getInfoList = req => {
+  let ProLine = ['麻醉', '重症', '数字化', '重症V6.0', '麻醉一体机', '移动护理']
+  let infoType = ['销售', '产品']
+
+  let InfoDate = [];
+
+  doCustomTimes(10, (i) => {
+    InfoDate.push(Mock.mock({
+     infoTitle:'@ctitle(3, 5)'+'需求申请',
+      hospName: '北京市人民医院'+'@natural(1, 10)',
+      'hospDept|1':ProLine,
+      supplierName:'苏州麦迪科技',
+      supplierContact:'@cname',
+      infoDetail:'@cparagraph',
+     'infoType|1':infoType,
+    'infoStatus|0-1':1,
+      createTime:'@date("yyyy-MM-dd")'
+    }))
+  })
+
+  return {
+    code: 200,
+    data: InfoDate,
     msg: ''
   }
 }
