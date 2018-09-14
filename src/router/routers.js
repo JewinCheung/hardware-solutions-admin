@@ -139,15 +139,24 @@ export default [
         component: () => import('@/view/purchasing-help/proline-manage.vue')
       },
       {
-        path: '/hard-type-manahe',
-        name: 'hard-type-manahe',
+        path: '/hard-type-manage',
+        name: 'hard-type-manage',
         meta: {
           icon: 'md-grid',
           title: '硬件分类维护'
         },
-        component: () => import('@/view/purchasing-help/hard-type-manahe.vue')
+        component: () => import('@/view/purchasing-help/hard-type-manage.vue')
+      },
+      {
+        path: '/hard-iem-manage',
+        name: 'hard-iem-manage',
+        meta: {
+          icon: 'md-grid',
+          title: '硬件信息维护'
+        },
+        component: () => import('@/view/purchasing-help/hard-iem-manage.vue')
       }
-
+      
       
 
     ]
