@@ -155,6 +155,15 @@ export default [
           title: '硬件信息维护'
         },
         component: () => import('@/view/purchasing-help/hard-iem-manage.vue')
+      },
+      {
+        path: '/hrad-solutions-manage',
+        name: 'hrad-solutions-manage',
+        meta: {
+          icon: 'md-grid',
+          title: '硬件方案分配'
+        },
+        component: () => import('@/view/purchasing-help/hrad-solutions-manage.vue')
       }
       
       
