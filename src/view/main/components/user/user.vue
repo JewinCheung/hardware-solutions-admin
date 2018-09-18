@@ -1,7 +1,8 @@
 <template>
   <div class="user-avator-dropdown">
     <Dropdown @on-click="handleClick">
-      <Avatar :src="userAvator"/>
+      <Avatar  icon="ios-person" size="large"/>
+        {{userName}}
       <Icon :size="18" type="md-arrow-dropdown"></Icon>
       <DropdownMenu slot="list">
         <DropdownItem name="logout">退出登录</DropdownItem>
@@ -19,12 +20,14 @@ export default {
     userAvator: {
       type: String,
       default: ''
+    },
+    userName: {
+      type: String,
+      default: ''
     }
   },
   methods: {
-    ...mapActions([
-      'handleLogOut'
-    ]),
+    ...mapActions(['handleLogOut']),
     handleClick (name) {
       switch (name) {
         case 'logout':

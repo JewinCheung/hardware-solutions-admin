@@ -1,9 +1,9 @@
-import { login, logout, getUserInfo } from '@/api/user'
+import { login, getUserInfo } from '@/api/user'
 import { setToken, getToken } from '@/libs/util'
 
 export default {
   state: {
-    account:'',
+    account: '',
     userName: '',
     userId: '',
     avatorImgPath: '',
@@ -37,9 +37,10 @@ export default {
           account,
           passwd
         }).then(res => {
-          const data = res.data
+          const data = res.Data
           console.log(res)
-          // commit('setToken', data.Data)
+          console.log(data)
+          commit('setToken', data)
           resolve()
         }).catch(err => {
           reject(err)
@@ -50,9 +51,9 @@ export default {
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
         // logout(state.token).then(() => {
-          commit('setToken', '')
-          commit('setAccess', [])
-          resolve()
+        commit('setToken', '')
+        commit('setAccess', [])
+        resolve()
         // }).catch(err => {
         //   reject(err)
         // })
@@ -63,15 +64,15 @@ export default {
       })
     },
     // 获取用户相关信息
-    getUserInfo ({commit }) {
+    getUserInfo ({commit}) {
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
-          const data = res.data
-          
+          const data = res
+          // console.log(data)
           // commit('setAvator', data.avator)
-          commit('setUserName', data.user_name)
-          commit('setUserId', data.user_id)
-          // commit('setAccess',)
+          commit('setUserName', data.UserName)
+          // commit('setUserId', data.user_id)
+          commit('setAccess', ['admin'])
           resolve(data)
         }).catch(err => {
           reject(err)

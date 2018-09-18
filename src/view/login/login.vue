@@ -28,15 +28,13 @@ export default {
       'getUserInfo'
     ]),
     handleSubmit ({ account, passwd }) {
-      console.log({ account, passwd });
-     this.handleLogin({ account, passwd }).then(res => {
-       console.log(res);
-        // this.getUserInfo().then(res => {
-          // this.$router.push({
-          //   name: 'home'
-          // })
-        // })
-     })
+      this.handleLogin({ account, passwd }).then(res => {
+        this.getUserInfo().then(res => {
+          this.$router.push({
+            name: 'home'
+          })
+        })
+      })
     }
   }
 }
