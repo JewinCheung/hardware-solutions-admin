@@ -3,6 +3,7 @@ import { setToken, getToken } from '@/libs/util'
 
 export default {
   state: {
+    account:'',
     userName: '',
     userId: '',
     avatorImgPath: '',
@@ -29,15 +30,16 @@ export default {
   },
   actions: {
     // 登录
-    handleLogin ({ commit }, {userName, password}) {
-      userName = userName.trim()
+    handleLogin ({ commit }, {account, passwd}) {
+      account = account.trim()
       return new Promise((resolve, reject) => {
         login({
-          userName,
-          password
+          account,
+          passwd
         }).then(res => {
           const data = res.data
-          commit('setToken', data.token)
+          console.log(res)
+          // commit('setToken', data.Data)
           resolve()
         }).catch(err => {
           reject(err)
@@ -47,13 +49,13 @@ export default {
     // 退出登录
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        // logout(state.token).then(() => {
           commit('setToken', '')
           commit('setAccess', [])
           resolve()
-        }).catch(err => {
-          reject(err)
-        })
+        // }).catch(err => {
+        //   reject(err)
+        // })
         // 如果你的退出登录无需请求接口，则可以直接使用下面三行代码而无需使用logout调用接口
         // commit('setToken', '')
         // commit('setAccess', [])
@@ -61,14 +63,15 @@ export default {
       })
     },
     // 获取用户相关信息
-    getUserInfo ({ state, commit }) {
+    getUserInfo ({commit }) {
       return new Promise((resolve, reject) => {
-        getUserInfo(state.token).then(res => {
+        getUserInfo().then(res => {
           const data = res.data
-          commit('setAvator', data.avator)
+          
+          // commit('setAvator', data.avator)
           commit('setUserName', data.user_name)
           commit('setUserId', data.user_id)
-          commit('setAccess', data.access)
+          // commit('setAccess',)
           resolve(data)
         }).catch(err => {
           reject(err)

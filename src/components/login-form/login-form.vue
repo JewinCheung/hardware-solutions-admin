@@ -1,7 +1,7 @@
 <template>
   <Form ref="loginForm" :model="form" :rules="rules" @keydown.enter.native="handleSubmit">
-    <FormItem prop="userName">
-      <Input v-model="form.userName" placeholder="请输入用户名">
+    <FormItem prop="account">
+      <Input v-model="form.account" placeholder="请输入工号">
         <span slot="prepend">
           <Icon :size="16" type="ios-person"></Icon>
         </span>
@@ -43,15 +43,15 @@ export default {
   data () {
     return {
       form: {
-        userName: 'super_admin',
-        password: ''
+        account: 'M1011',
+        password: 'jewin240'
       }
     }
   },
   computed: {
     rules () {
       return {
-        userName: this.userNameRules,
+        account: this.userNameRules,
         password: this.passwordRules
       }
     }
@@ -61,8 +61,8 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.$emit('on-success-valid', {
-            userName: this.form.userName,
-            password: this.form.password
+            account: this.form.account,
+            passwd: this.form.password
           })
         }
       })
