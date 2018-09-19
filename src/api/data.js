@@ -14,7 +14,6 @@ export const getProLine = () => {
   })
 }
 
-
 export const getHardType = () => {
   return axios.request({
     url: 'getHardType',
@@ -36,18 +35,28 @@ export const getInfoList = () => {
   })
 }
 
-
-
 export const productLine = {
 
-  add(data) {
+  add (data) {
     return axios.request({
       url: 'ProLine/addProLine',
       data,
       method: 'post'
     })
-
+  },
+  edit (id, data) {
+    return axios.request({
+      url: 'ProLine/EditProLine/' + id,
+      data,
+      method: 'post'
+    })
   },
 
+  getData () {
+    return axios.request({
+      url: 'ProLine/GetProLine',
+      method: 'get'
+    })
+  }
 
 }
