@@ -46,7 +46,7 @@ export const hasOneOf = (target, arr) => {
  * @param {String|Number} value 要验证的字符串或数值
  * @param {*} validList 用来验证的列表
  */
-export function oneOf (value, validList) {
+export function oneOf(value, validList) {
   for (let i = 0; i < validList.length; i++) {
     if (value === validList[i]) {
       return true
@@ -187,3 +187,42 @@ export const off = (function () {
     }
   }
 })()
+
+
+/**
+ * 
+ * @param {*} data 请求返回的数据
+ * @param {*} funcSuc 数据操作成功后执行
+ * @param {*} funcErr 数据操作失败后执行
+ * @description 统一处理 返回的json数据格式
+ */
+export const resData = (data, funcSuc, funcErr) => {
+  if (!data || !data.Statu) {
+    return;
+  }
+  switch (data.Statu) {
+    case "Y":
+      if (data.Msg && data.Msg.length > 0) {
+        if (funcSuc) funcSuc(data);
+      } else {
+        funcSuc(data);
+      }
+      break;
+    case "N":
+      if (funcErr) {
+        funcErr(data);
+      }
+      break;
+  }
+}
+
+export const ObjEach = (data) => {
+  Object.keys(data).forEach(key => {
+    // console.log('key:' + key + "-value:" + data[key]);
+    if (typeof (data[key]) === "undefined") {
+      data[key] = null;
+    }
+  })
+  return data;
+
+}

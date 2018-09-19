@@ -1,12 +1,17 @@
 import Cookies from 'js-cookie'
 // cookie保存的天数
 import config from '@/config'
-import { forEach, hasOneOf } from '@/libs/tools'
+import {
+  forEach,
+  hasOneOf
+} from '@/libs/tools'
 
 export const TOKEN_KEY = 'token'
 
 export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, {expires: config.cookieExpires || 1})
+  Cookies.set(TOKEN_KEY, token, {
+    expires: config.cookieExpires || 1
+  })
 }
 
 export const getToken = () => {
@@ -66,7 +71,9 @@ export const getBreadCrumbList = (routeMetched, homeRoute) => {
   res = res.filter(item => {
     return !item.meta.hideInMenu
   })
-  return [Object.assign(homeRoute, { to: homeRoute.path }), ...res]
+  return [Object.assign(homeRoute, {
+    to: homeRoute.path
+  }), ...res]
 }
 
 export const showTitle = (item, vm) => vm.$config.useI18n ? vm.$t(item.name) : ((item.meta && item.meta.title) || item.name)
@@ -111,10 +118,18 @@ export const getHomeRoute = routers => {
  * @description 如果该newRoute已经存在则不再添加
  */
 export const getNewTagList = (list, newRoute) => {
-  const { name, path, meta } = newRoute
+  const {
+    name,
+    path,
+    meta
+  } = newRoute
   let newList = [...list]
   if (newList.findIndex(item => item.name === name) >= 0) return newList
-  else newList.push({ name, path, meta })
+  else newList.push({
+    name,
+    path,
+    meta
+  })
   return newList
 }
 
@@ -270,3 +285,5 @@ export const findNodeDownward = (ele, tag) => {
 export const showByAccess = (access, canViewAccess) => {
   return hasOneOf(canViewAccess, access)
 }
+
+

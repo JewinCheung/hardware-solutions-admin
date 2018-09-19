@@ -38,6 +38,16 @@ export const getInfoList = () => {
 
 
 
+export const productLine = {
+
+  add(data) {
+    return axios.request({
+      url: 'ProLine/addProLine',
+      data,
+      method: 'post'
+    })
+
+  },
 
 
-
+}
