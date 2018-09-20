@@ -289,7 +289,7 @@
         this.smallTypeInfo = {};
         //加载配置
         this.getTypeConfigData(item.SerialNo);
-        if (item.smallType.length === 0) {
+        if (!item.smallType || item.smallType.length === 0) {
           this.$Message.warning(item.MatTypeName + '-无硬件小类');
           return;
         }
@@ -380,6 +380,7 @@
 
 
       },
+
       addType(name) {
 
         this.$refs.typeInfoForm.resetFields() // 重置表单
@@ -432,8 +433,10 @@
         }
 
         hardType.getTypeInfo(SerialNo).then(res => {
-          this.typeForm = res;
-          console.log(this.typeForm)
+          if (res) {
+            this.typeForm = res;
+          };
+
         })
 
 
