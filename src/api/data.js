@@ -60,3 +60,53 @@ export const productLine = {
   }
 
 }
+
+
+
+export const hardType ={
+
+  saveHardType (data) {
+    return axios.request({
+      url: 'HardType/SaveHardType',
+      data,
+      method: 'post'
+    })
+  },
+
+  saveTypeConfig (data) {
+    return axios.request({
+      url: 'HardType/SaveTypeConfig',
+      data,
+      method: 'post'
+    })
+  },
+
+  getHardType () {
+    return axios.request({
+      url: 'HardType/GetHardType/1001X21000000002JO17',
+      method: 'get'
+    })
+  },
+
+  getTypeConfig (id) {
+    return axios.request({
+      url: 'HardType/GeTypeConfig/'+id,
+      method: 'get'
+    })
+  },
+
+  getTypeInfo (id) {
+    return axios.request({
+      url: 'HardType/GetTypeInfo/'+id,
+      method: 'get'
+    })
+  },
+
+  getConfigInfo (id) {
+    return axios.request({
+      url: 'HardType/GetConfigInfo/'+id,
+      method: 'get'
+    })
+  }
+
+}

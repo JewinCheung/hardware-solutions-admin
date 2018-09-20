@@ -25,6 +25,11 @@ Vue.config.productionTip = false
  * @description 全局注册应用配置
  */
 Vue.prototype.$config = config
+
+Vue.prototype.$Message.config({
+  top: 100,
+  duration: 3
+});
 /**
  * 注册指令
  */

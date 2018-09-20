@@ -63,192 +63,190 @@
 </template>
 
 <script>
-import { productLine } from '@/api/data'
-import { resData, ObjEach } from '@/libs/tools'
-export default {
-  name: 'proline-manage',
-  data () {
-    return {
-      proLineData: [],
-      proLineColumns: [],
-      onSelect: {
-        row: null
-      },
-      show_Modal: false,
-      modal_loading: false,
-      infoForm: {
-        // DictName: '',
-        // DictParam: '',
-        // DictNo:'',
-        DictSort: 1,
-        IsEnabledBtn: true
-        // Memo: ''
-      },
-      ruleValidate: {
-        DictName: [
-          {
+  import {
+    productLine
+  } from '@/api/data'
+  import {
+    resData,
+    ObjEach
+  } from '@/libs/tools'
+  export default {
+    name: 'proline-manage',
+    data() {
+      return {
+        proLineData: [],
+        proLineColumns: [],
+        onSelect: {
+          row: null
+        },
+        show_Modal: false,
+        modal_loading: false,
+        infoForm: {
+          // DictName: '',
+          // DictParam: '',
+          // DictNo:'',
+          DictSort: 1,
+          IsEnabledBtn: true
+          // Memo: ''
+        },
+        ruleValidate: {
+          DictName: [{
             required: true,
             message: '不能为空'
-          }
-        ],
-        DictNo: [
-          {
+          }],
+          DictNo: [{
             required: true,
             message: '不能为空'
-          }
-        ],
-        DictSort: [
-          {
+          }],
+          DictSort: [{
             required: true,
             message: '不能为空'
+          }]
+        }
+      }
+    },
+    mounted() {
+      this.setInfoColumns()
+      this.getProLine()
+    },
+
+    methods: {
+      setInfoColumns() {
+        this.proLineColumns = [{
+            title: '产品线名称',
+            key: 'DictName',
+            tooltip: true
+          },
+          {
+            title: '版本号',
+            key: 'DictParam'
+          },
+          {
+            title: '编号',
+            key: 'DictNo'
+          },
+          {
+            title: '序号',
+            key: 'DictSort',
+            align: 'center'
+          },
+          {
+            title: '是否启用',
+            key: 'IsEnabled',
+            align: 'center',
+            render: (h, params) => {
+              const row = params.row
+              const text = row.IsEnabled === 0 ? '启用' : '停用'
+              return h('div', text)
+            }
+          },
+          {
+            title: '说明',
+            key: 'Memo'
           }
         ]
-      }
-    }
-  },
-  mounted () {
-    this.setInfoColumns()
-    this.getProLine()
-  },
+      },
 
-  methods: {
-    setInfoColumns () {
-      this.proLineColumns = [
-        {
-          title: '产品线名称',
-          key: 'DictName',
-          tooltip: true
-        },
-        {
-          title: '版本号',
-          key: 'DictParam'
-        },
-        {
-          title: '编号',
-          key: 'DictNo'
-        },
-        {
-          title: '序号',
-          key: 'DictSort',
-          align: 'center'
-        },
-        {
-          title: '编号',
-          key: 'remark'
-        },
-        {
-          title: '是否启用',
-          key: 'IsEnabled',
-          align: 'center',
-          render: (h, params) => {
-            const row = params.row
-            const text = row.IsEnabled === 0 ? '启用' : '停用'
-            return h('div', text)
-          }
-        },
-        {
-          title: '说明',
-          key: 'Memo'
-        }
-      ]
-    },
-
-    getProLine () {
-      productLine.getData().then(res => {
-        this.proLineData = res
-        this.proLineData.map(itme => {
-          itme.IsEnabledBtn = itme.IsEnabled === 0
+      getProLine() {
+        productLine.getData().then(res => {
+          this.proLineData = res
+          this.proLineData.map(itme => {
+            itme.IsEnabledBtn = itme.IsEnabled === 0 ? true : false;
+          })
         })
-      })
-    },
+      },
 
-    onRowClick (row, index) {
-      this.onSelect.row = row
-    },
-    onRowDblclick (row, index) {
-      this.onSelect.row = row
-      this.editInfo()
-    },
-    addInfo () {
-      this.$refs.tables.clearCurrentRow() // 清除 表格选中高亮
-      this.$refs.infoForm.resetFields() // 重置表单
+      onRowClick(row, index) {
+        this.onSelect.row = row
+      },
+      onRowDblclick(row, index) {
+        this.onSelect.row = row
+        this.editInfo()
+      },
+      addInfo() {
+        this.$refs.tables.clearCurrentRow() // 清除 表格选中高亮
+        this.$refs.infoForm.resetFields() // 重置表单
 
-      this.show_Modal = true
-      this.onSelect.row = null // 清除表格索引
-    },
-    editInfo () {
-      if (!this.onSelect.row) {
-        this.$Message.error('请选择行！')
-        return
-      }
-
-      this.infoForm = this.onSelect.row
-
-      this.show_Modal = true
-    },
-    handleSubmit (name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          //  this.modal_loading = true;
-          var postData = ObjEach(this.infoForm)
-          postData['IsEnabled'] = postData.IsEnabledBtn ? 0 : 1
-
-          if (!this.onSelect.row) {
-            productLine.add(postData).then(res => {
-              resData(
-                res,
-                res => {
-                  this.$Message.success(res.Msg)
-                  var postDataInfo = res.Data
-                  postDataInfo['IsEnabledBtn'] =
-                    postDataInfo.IsEnabled === 0
-                  this.proLineData.unshift(postDataInfo)
-                  this.modal_loading = false
-                  this.show_Modal = false
-                },
-                res => {
-                  this.$Message.success(res.Msg)
-                }
-              )
-            })
-          } else {
-            productLine.edit(this.onSelect.row.SerialNo, postData).then(res => {
-              resData(
-                res,
-                res => {
-                  this.$Message.success(res.Msg)
-                  var NewData = []
-                  NewData = this.proLineData.map(itme => {
-                    if (itme.SerialNo === res.Data.SerialNo) {
-                      itme = this.infoForm
-                      itme.IsEnabled = this.infoForm.IsEnabledBtn ? 0 : 1
-                    }
-                    return itme
-                  })
-                  this.proLineData = NewData
-                  this.modal_loading = false
-                  this.show_Modal = false
-                },
-                res => {
-                  this.$Message.success(res.Msg)
-                }
-              )
-            })
-          }
+        this.show_Modal = true
+        this.onSelect.row = null // 清除表格索引
+      },
+      editInfo() {
+        if (!this.onSelect.row) {
+          this.$Message.error('请选择行！')
+          return
         }
-      })
+
+        this.infoForm = this.onSelect.row
+        this.show_Modal = true
+      },
+      handleSubmit(name) {
+        this.$refs[name].validate(valid => {
+          if (valid) {
+            //  this.modal_loading = true;
+            
+            var postData = ObjEach(this.infoForm)
+            postData['IsEnabled'] = postData.IsEnabledBtn ? 0 : 1
+
+            if (!this.onSelect.row) {
+              productLine.add(postData).then(res => {
+                resData(
+                  res,
+                  res => {
+                    this.$Message.success(res.Msg)
+                    var postDataInfo = res.Data
+                    postDataInfo['IsEnabledBtn'] = postDataInfo.IsEnabled === 0 ? true : false;
+                    this.proLineData.unshift(postDataInfo)
+                    this.modal_loading = false
+                    this.show_Modal = false
+                  },
+                  res => {
+                    this.$Message.success(res.Msg)
+                  }
+                )
+              })
+            } else {
+              productLine.edit(this.onSelect.row.SerialNo, postData).then(res => {
+                resData(
+                  res,
+                  res => {
+                    this.$Message.success(res.Msg)
+                    var NewData = []
+                    NewData = this.proLineData.map(itme => {
+                      if (itme.SerialNo === res.Data.SerialNo) {
+                        itme = res.Data
+                        // itme.IsEnabled = res.Data.IsEnabledBtn ? 0 : 1
+                        itme.IsEnabledBtn = res.Data.IsEnabled === 0? true : false;
+                      }
+                      return itme
+                    })
+                    this.proLineData = NewData
+                      console.log(this.proLineData)
+                    this.modal_loading = false
+                    this.show_Modal = false
+                    this.onSelect.row = null // 清除表格索引
+                  },
+                  res => {
+                    this.$Message.success(res.Msg)
+                  }
+                )
+              })
+            }
+          }
+        })
+      }
     }
   }
-}
+
 </script>
 <style lang='less' scoped>
-.sales-information-feedback {
-  .tools {
-    margin: 0 0 5 0;
+  .sales-information-feedback {
+    .tools {
+      margin: 0 0 5 0;
 
-    button {
-      margin: 5px;
+      button {
+        margin: 5px;
+      }
     }
   }
-}
+
 </style>
