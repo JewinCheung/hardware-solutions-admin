@@ -56,7 +56,9 @@
           硬件分类
         </p>
         <div style="height: 334px;">
-
+          <div class="iview-admin-draggable-list">
+            <Tree :data="typeTree"></Tree>
+          </div>
         </div>
       </Card>
       </Col>
@@ -73,9 +75,9 @@
               硬件配置-[{{smallTypeData.MatTypeName}}]
             </p>
             <ButtonGroup shape="circle" slot="extra">
-              <Button icon="md-add"></Button>
-              <Button icon="md-create"></Button>
-              <Button icon="md-remove"></Button>
+              <Button icon="md-add" @click="addConfig('config')"></Button>
+              <Button icon="md-create" @click="editConfig('config')"></Button>
+              <Button icon="md-remove" disabled></Button>
             </ButtonGroup>
             <div style="height: 300px;">
               <ul class="iview-admin-draggable-list">
@@ -94,9 +96,9 @@
               配置选项-[{{ConfigItmeData.ItmeName}}]
             </p>
             <ButtonGroup shape="circle" slot="extra">
-              <Button icon="md-add"></Button>
-              <Button icon="md-create"></Button>
-              <Button icon="md-remove"></Button>
+              <Button icon="md-add" @click="addConfig('item')"></Button>
+              <Button icon="md-create" @click="editConfig('item')"></Button>
+              <Button icon="md-remove" disabled></Button>
             </ButtonGroup>
             <div style="height: 300px;">
               <ul id="todoList" class="iview-admin-draggable-list">
@@ -118,9 +120,9 @@
           配置清单
         </p>
         <div style="height: 334px;">
-          <ul class="iview-admin-draggable-list">
-
-          </ul>
+          <div class="iview-admin-draggable-list">
+            <Tree :data="configTree"></Tree>
+          </div>
         </div>
       </Card>
       </Col>
@@ -146,6 +148,29 @@
       <div slot="footer">
         <Button type="primary" @click="handleTypeSubmit('typeInfoForm')" :loading="hardType_loading">保存</Button>
         <Button @click="hardType_Modal=false" style="margin-left: 8px">关闭</Button>
+      </div>
+    </Modal>
+
+
+    <Modal v-model="config_Modal">
+      <p slot="header" style="text-align:center">
+
+        <span>{{typeName.name}}</span>
+      </p>
+      <div>
+        <Form ref="configInfoForm" :model="configForm" :rules="ruleValidate_congfig" :label-width="100">
+          <FormItem label="名称:" prop="ItmeName">
+            <Input v-model="configForm.ItmeName" />
+          </FormItem>
+          <FormItem label="说明:" prop="Memo">
+            <Input v-model="configForm.Memo" type="textarea" :autosize="{minRows: 2,maxRows: 5}" />
+          </FormItem>
+        </Form>
+
+      </div>
+      <div slot="footer">
+        <Button type="primary" @click="handleConfigSubmit('configInfoForm')" :loading="hardType_loading">保存</Button>
+        <Button @click="config_Modal=false" style="margin-left: 8px">关闭</Button>
       </div>
     </Modal>
   </div>
@@ -226,12 +251,15 @@
         ],
         hardType_loading: false, //按钮状态
         hardType_Modal: false, //弹出框
+        config_Modal: false, //弹出框
         hardTypeData: [], //类别集合[{大类,[小类,小类,小类]},{大类,[小类,小类,小类]}]
         smallTypeData: {}, //详情，小类集合{大类,[小类,小类小类]}
         TypeConfigData: [], //配置集合[{配置,[配置选项,配置选项]},{配置,[配置选项,配置选项]}]
         ConfigItmeData: {}, //配置详情，选项集合{配置,[配置选项,配置选项]}
         smallTypeInfo: {}, //类详情
         ConfigItmeInfo: {}, //配置详情
+        typeTree: [],
+        configTree: [],
         typeName: { //弹出框熟悉
           id: '', //big small  config item
           name: '', //title
@@ -250,7 +278,13 @@
             required: true,
             message: '不能为空'
           }]
-        }
+        },
+        ruleValidate_congfig: { //表单验证
+          ItmeName: [{
+            required: true,
+            message: '不能为空'
+          }]
+        },
 
 
 
@@ -266,15 +300,51 @@
       getHardTypeData() {
         hardType.getHardType().then(res => {
           this.hardTypeData = res.Data
+          this.getTypeTree();
+        })
+
+      },
+      getTypeTree() {
+
+        this.typeTree = this.hardTypeData.map(item => {
+          return {
+            title: item.MatTypeName,
+            expand: true,
+            children: this.getChildren(item.smallType, "MatTypeName")
+          }
+
+
+        })
+      },
+      getConfigTree() {
+
+        this.configTree = this.TypeConfigData.map(item => {
+          return {
+            title: item.ItmeName,
+            expand: true,
+            children: this.getChildren(item.ConfigItme, "ItmeName")
+          }
+
+
+        })
+      },
+      getChildren(data, name) {
+        var list = data.map(item => {
+          return {
+            title: item[name],
+            expand: true,
+          }
 
         })
 
+        return list;
       },
       //获取硬件配置
       getTypeConfigData(SerialNo) {
         this.ConfigItmeData = [];
         hardType.getTypeConfig(SerialNo).then(res => {
           this.TypeConfigData = res.Data
+          this.getConfigTree();
           if (res.Data.length === 0) {
             this.$Message.warning(this.smallTypeData.MatTypeName + '-无硬件配置');
             return;
@@ -287,6 +357,7 @@
 
         this.smallTypeData = item;
         this.smallTypeInfo = {};
+        this.ConfigItmeInfo = {};
         //加载配置
         this.getTypeConfigData(item.SerialNo);
         if (!item.smallType || item.smallType.length === 0) {
@@ -303,6 +374,8 @@
       typeConfigClick(item) {
 
         this.ConfigItmeData = item;
+        console.log(this.ConfigItmeData)
+        this.ConfigItmeInfo = {};
         if (item.ConfigItme.length === 0) {
           this.$Message.warning(item.ItmeName + '-无配置选项');
           return;
@@ -320,20 +393,23 @@
         var postData = this.typeForm;
         this.$refs[name].validate(valid => {
           if (valid) {
-            this.hardType_Modal = true;
+            this.hardType_loading = true;
             hardType.saveHardType(postData).then(res => {
               resData(res, res => {
                 var postDataInfo = res.Data;
                 if (this.typeName.id === 'big') {
 
                   if (this.typeName.type === "add") {
+                    postDataInfo["smallType"] = [];
                     this.hardTypeData.unshift(postDataInfo);
                   } else {
 
                     var NewData = []
                     NewData = this.hardTypeData.map(itme => {
+                      var smallType = itme.smallType;
                       if (itme.SerialNo === postDataInfo.SerialNo) {
                         itme = postDataInfo;
+                        itme["smallType"] = smallType;
                       }
                       return itme;
                     });
@@ -342,7 +418,7 @@
 
                 } else {
                   if (this.typeName.type === "add") {
-                    console.log(this.smallTypeData.smallType);
+                    // console.log(this.smallTypeData.smallType);
                     this.smallTypeData.smallType.unshift(postDataInfo);
                   } else {
 
@@ -358,16 +434,17 @@
 
                 }
                 this.hardType_Modal = false;
-                this.hardType_Modal = false;
-                this.$Message.success(res.Msg)
-              }, res => {
+
                 this.$Message.success(res.Msg);
+              }, res => {
+                this.$Message.error(res.Msg);
 
 
               })
 
-
-
+              this.hardType_loading = false;
+              this.getTypeTree();
+              this.getConfigTree();
             })
           }
         });
@@ -404,7 +481,7 @@
         }
         this.typeForm["SerialNo"] = "";
         this.hardType_Modal = true;
-        console.log(this.typeForm)
+
       },
       editType(name) {
 
@@ -442,8 +519,140 @@
 
         this.hardType_Modal = true;
 
-      }
+      },
 
+      addConfig(name) {
+
+        this.$refs.configInfoForm.resetFields() // 重置表单
+        this.typeName.id = name;
+        this.typeName.type = 'add';
+        if (!this.smallTypeData.SerialNo) {
+          this.$Message.error('请选择硬件大类');
+          return;
+        }
+        if (name === "config") {
+
+          this.typeName.name = "硬件配置-新增";
+          this.configForm["ParentNo"] = this.smallTypeData.SerialNo;
+
+
+        }
+        if (name === "item") {
+          if (!this.ConfigItmeData.SerialNo) {
+            this.$Message.error('请选择硬件配置');
+            return;
+          }
+          this.typeName.name = "配置选项-新增-所属配置[" + this.ConfigItmeData.ItmeName + "]";
+          this.configForm["ParentNo"] = this.ConfigItmeData.SerialNo;
+
+        }
+        this.configForm["SerialNo"] = "";
+        this.configForm["IsEnabled"] = 0;
+        this.config_Modal = true;
+      },
+
+      editConfig(name) {
+        this.typeName.id = name;
+        this.typeName.type = 'edit'
+        var SerialNo = '';
+
+
+        if (name === "config") {
+          if (!this.ConfigItmeData.SerialNo) {
+            this.$Message.error('请选择硬件配置');
+            return;
+          }
+          this.typeName.name = "硬件配置-编辑";
+
+          SerialNo = this.ConfigItmeData.SerialNo;
+
+        }
+
+        if (name === "item") {
+
+          if (!this.ConfigItmeInfo.SerialNo) {
+            this.$Message.error('请选择配置选项');
+            return;
+          }
+          this.typeName.name = "配置选项-编辑-所属配置[" + this.ConfigItmeInfo.ItmeName + "]";
+          SerialNo = this.ConfigItmeInfo.SerialNo;
+        }
+
+        hardType.getConfigInfo(SerialNo).then(res => {
+          if (res) {
+            this.configForm = res;
+            this.configForm["IsEnabled"] = 0;
+          };
+
+        })
+        this.config_Modal = true;
+
+      },
+
+      handleConfigSubmit(name) {
+
+        var postData = this.configForm;
+        this.$refs[name].validate(valid => {
+          if (valid) {
+            this.hardType_loading = true;
+            hardType.saveTypeConfig(postData).then(res => {
+              resData(res, res => {
+                var postDataInfo = res.Data;
+                if (this.typeName.id === 'config') {
+
+                  if (this.typeName.type === "add") {
+                    postDataInfo["ConfigItme"] = [];
+                    this.TypeConfigData.unshift(postDataInfo);
+                  } else {
+
+                    var NewData = []
+                    NewData = this.TypeConfigData.map(itme => {
+                      var ConfigItme = itme.ConfigItme;
+                      if (itme.SerialNo === postDataInfo.SerialNo) {
+                        itme = postDataInfo;
+                        itme["ConfigItme"] = ConfigItme;
+                      }
+                      return itme;
+                    });
+                    this.TypeConfigData = NewData;
+                  }
+
+                } else {
+                  if (this.typeName.type === "add") {
+                    // console.log(this.smallTypeData.smallType);
+                    this.ConfigItmeData.ConfigItme.unshift(postDataInfo);
+                  } else {
+
+                    var NewData = []
+                    NewData = this.ConfigItmeData.ConfigItme.map(itme => {
+
+                      if (itme.SerialNo === postDataInfo.SerialNo) {
+                        itme = postDataInfo;
+
+                      }
+                      return itme;
+                    });
+                    this.ConfigItmeData.ConfigItme = NewData;
+                  }
+
+                }
+                this.config_Modal = false;
+
+                this.$Message.success(res.Msg)
+              }, res => {
+                this.$Message.error(res.Msg);
+
+
+              })
+
+              this.hardType_loading = false;
+              this.getTypeTree();
+              this.getConfigTree();
+            })
+          }
+        });
+
+      }
 
 
     }
@@ -465,17 +674,19 @@
     transition: all 0.2s;
   }
 
+
   .iview-admin-draggable-list li:hover {
-    color: #87b4ee;
+    // color: #87b4ee;
     border-color: #87b4ee;
     transition: all 0.2s;
   }
 
   .iview-admin-draggable-list .select {
     color: #fff;
-    background-color: #2d8cf0;
+    background-color: #57c5f7;
 
   }
+
 
 
   .placeholder-style {

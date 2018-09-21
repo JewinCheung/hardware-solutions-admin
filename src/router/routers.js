@@ -148,13 +148,13 @@ export default [
         component: () => import('@/view/purchasing-help/hard-type-manage.vue')
       },
       {
-        path: '/hard-iem-manage',
-        name: 'hard-iem-manage',
+        path: '/hard-item-manage',
+        name: 'hard-item-manage',
         meta: {
           icon: 'md-grid',
           title: '硬件信息维护'
         },
-        component: () => import('@/view/purchasing-help/hard-iem-manage.vue')
+        component: () => import('@/view/purchasing-help/hard-item-manage.vue')
       },
       {
         path: '/hrad-solutions-manage',

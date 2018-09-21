@@ -7,26 +7,25 @@
           <Icon type="search" />&nbsp;&nbsp;搜索</Button>
 
       </div>
-      <div class="tag-nav-line">
+      <div class="tag-nav-line" style="height:30px">
         硬件分类：
-        <Select v-model="bigType" style="width:160px" @on-change="getSmall">
-          <Option v-for="item in HardType" :value="item.bigType" :key="item.bigType">{{ item.bigType }}</Option>
+        <Select v-model="bigTypeNo" style="width:160px" @on-change="getSmall">
+          <Option v-for="item in hardTypeData" :value="item.SerialNo" :key="item.SerialNo">{{ item.MatTypeName }}</Option>
         </Select>
-        <Tag v-for="item in smallType" :key="`tag-nav-${item}`" :name="item" color="default" @click.native="tagAdd(item)">{{
-          item }}</Tag>
+        <Tag v-for="item in smallType" :key="item.SerialNo" :name="item.MatTypeName" color="default" @click.native="tagAdd(item.MatTypeName)">{{
+          item.MatTypeName }}</Tag>
       </div>
-      <div style="height:30px">
+      <div style="height:22px;margin: 5px 0 5px 0;">
         <Tag closable v-for="item in tagCount" :key="item" :name="item.title" color="warning" @on-close="tagClose(item)">{{
           item}}</Tag>
       </div>
       <div class="tools">
-        <ButtonGroup>
-          <Button type="primary">新增</Button>
-          <Button type="primary">编辑</Button>
-          <Button type="primary">删除</Button>
-          <Button type="primary">启用</Button>
-          <Button type="primary">停用</Button>
-        </ButtonGroup>
+          <ButtonGroup>
+            <Button type="info" icon="md-add">新增</Button>
+            <Button type="info" icon="md-create">编辑</Button>
+            <Button type="info" icon="md-checkmark">启用</Button>
+            <Button type="info" icon="md-close">停用</Button>
+          </ButtonGroup>
       </div>
       <Table :data="hardList" :columns="hardColumns" stripe ref="tables"></Table>
       <div style="margin: 10px;overflow: hidden">
@@ -39,37 +38,55 @@
 </template>
 
 <script>
-  import Tables from '_c/tables'
   import {
-    getProLine,
-    getHardType,
-    getHardList
+    hardType
   } from '@/api/data'
   export default {
-    name: 'hard-iem-manage',
-    components: {
-      Tables
-    },
+    name: 'hard-item-manage',
     data() {
       return {
         searchValue: '',
         HardType: [], // 硬件分类
         smallType: [], // 硬件小类
         tag_name: 'default', // 默认标签
-        bigType: '', // 模式大类
+
         tagCount: [],
         hardList: [],
-        hardColumns: []
+        hardColumns: [],
+
+        bigTypeNo: '', // 模式大类
+        hardTypeData: [],
       }
     },
+    mounted() {
+
+      // 初始化硬件分类
+
+      // 硬件列表
+      this.sethardColumns()
+      this.handleSearch()
+
+
+      this.getHardTypeData()
+    },
     methods: {
+
+      getHardTypeData() {
+        hardType.getHardType().then(res => {
+          this.hardTypeData = res.Data
+
+        })
+
+      },
+
       // 切换硬件小分类
       getsmallType() {
-        const bigTypeName = this.bigType
 
-        const HardType = this.HardType.filter(item => {
-          return item.bigType === bigTypeName
-        })
+        const SerialNo = this.bigTypeNo
+
+        const HardType = this.hardTypeData.filter((item) => {
+          return item.SerialNo === SerialNo
+        });
 
         setTimeout(() => {
           this.smallType = HardType[0].smallType
@@ -253,47 +270,29 @@
           this.tagAdd(this.searchValue)
         }
         // 硬件列表
-        getHardList().then(res => {
-          this.hardList = res.data
-          if (this.tagCount.length > 0) {
-            this.hardList = this.hardList.filter(item => {
-              var isOk = false
-              this.tagCount.map(i => {
-                if (
-                  item.bigType.indexOf(i) > -1 ||
-                  item.smallType.indexOf(i) > -1
-                ) {
-                  return (isOk = true)
-                }
-              })
-              if (isOk) {
-                return item
-              }
-            })
-          }
-        })
+        // getHardList().then(res => {
+        //   this.hardList = res.data
+        //   if (this.tagCount.length > 0) {
+        //     this.hardList = this.hardList.filter(item => {
+        //       var isOk = false
+        //       this.tagCount.map(i => {
+        //         if (
+        //           item.bigType.indexOf(i) > -1 ||
+        //           item.smallType.indexOf(i) > -1
+        //         ) {
+        //           return (isOk = true)
+        //         }
+        //       })
+        //       if (isOk) {
+        //         return item
+        //       }
+        //     })
+        //   }
+        // })
       },
-      exportData() {
-        this.$refs.tables.exportCsv({
-          filename: `硬件列表-${(new Date()).valueOf()}.csv`,
-          columns: this.hardColumns.filter((col, index) => index != 5),
-          data: this.hardList.filter((data, index) => index != 5)
-        })
 
-      }
-    },
-    mounted() {
-
-      // 初始化硬件分类
-      getHardType().then(res => {
-        this.HardType = res.data
-        this.bigType = this.HardType[0].bigType
-        this.getsmallType()
-      })
-      // 硬件列表
-      this.sethardColumns()
-      this.handleSearch()
     }
+
   }
 
 </script>
@@ -301,11 +300,11 @@
 <style lang="less">
   .hard-iem-manage {
     .tools {
-      margin: 0 0 5 0;
+      margin: 0 0 10px 0;
 
-      Button {
-        margin: 5px;
-      }
+      // Button {
+      //   margin: 5px;
+      // }
     }
 
     .search-con {
@@ -320,7 +319,7 @@
       .ivu-tag {
         height: 28px;
         line-height: 28px;
-        margin: 5px;
+        margin: 0 5px 0 5px;
         border: 1;
       }
 
