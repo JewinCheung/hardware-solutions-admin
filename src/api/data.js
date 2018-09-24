@@ -61,9 +61,7 @@ export const productLine = {
 
 }
 
-
-
-export const hardType ={
+export const hardType = {
 
   saveHardType (data) {
     return axios.request({
@@ -90,21 +88,44 @@ export const hardType ={
 
   getTypeConfig (id) {
     return axios.request({
-      url: 'HardType/GeTypeConfig/'+id,
+      url: 'HardType/GeTypeConfig/' + id,
       method: 'get'
     })
   },
 
   getTypeInfo (id) {
     return axios.request({
-      url: 'HardType/GetTypeInfo/'+id,
+      url: 'HardType/GetTypeInfo/' + id,
       method: 'get'
     })
   },
 
   getConfigInfo (id) {
     return axios.request({
-      url: 'HardType/GetConfigInfo/'+id,
+      url: 'HardType/GetConfigInfo/' + id,
+      method: 'get'
+    })
+  }
+
+}
+
+export const hardItem = {
+
+  saveItem (data) {
+    return axios.request({
+      url: 'MaterialItem/SaveItem',
+      data,
+      method: 'post'
+    })
+  },
+
+  getItemData ({PageIndex, PageSize}) {
+    const data = {
+      PageIndex, PageSize
+    }
+    return axios.request({
+      url: 'MaterialItem/GetItem',
+      params: data,
       method: 'get'
     })
   }
