@@ -57,7 +57,7 @@ namespace Pmis.Web.Api
 
            
                         //文件存储地址
-                        string rootPath = "D:\\HardImg";
+                        string rootPath = "E:\\PMIS_DOC\\Hard";
                         var dirTempPath = rootPath + "\\" + DateTime.Now.ToString("yyyyMMdd") + "\\";
                         string dirPath = Path.Combine(dirTempPath);
                         string FileName = DateTime.Now.ToString("yyyyMMddHHmmssfff") + FileType;

@@ -119,15 +119,24 @@ export const hardItem = {
     })
   },
 
-  getItemData ({PageIndex, PageSize}) {
+  getItemData ({PageIndex, PageSize,QueryKey}) {
     const data = {
-      PageIndex, PageSize
+      PageIndex, PageSize,QueryKey
     }
     return axios.request({
       url: 'MaterialItem/GetItem',
       params: data,
       method: 'get'
     })
-  }
+  },
+
+  setConfig (data) {
+    return axios.request({
+      url: 'MaterialItem/SetConfig',
+      data,
+      method: 'post'
+    })
+  },
+  
 
 }

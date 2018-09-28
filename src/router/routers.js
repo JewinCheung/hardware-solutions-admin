@@ -48,7 +48,8 @@ export default [
     name: 'sales-help',
     meta: {
       icon: 'logo-buffer',
-      title: '销售人员自助'
+      title: '销售人员自助',
+      hideInMenu: true,
     },
     component: Main,
     children: [
@@ -77,7 +78,8 @@ export default [
     name: 'product-help',
     meta: {
       icon: 'md-menu',
-      title: '产品人员自助'
+      title: '产品人员自助',
+      hideInMenu: true,
     },
     component: Main,
     children: [
@@ -116,7 +118,8 @@ export default [
         name: 'purchasing-hard-query',
         meta: {
           icon: 'md-trending-up',
-          title: '采购-硬件库查询'
+          title: '采购-硬件库查询',
+          hideInMenu: true,
         },
         component: () => import('@/view/purchasing-help/hard-query.vue')
       },
@@ -125,7 +128,8 @@ export default [
         name: 'purchasing-information-feedback',
         meta: {
           icon: 'md-grid',
-          title: '采购-现场信息反馈'
+          title: '采购-现场信息反馈',
+          hideInMenu: true,
         },
         component: () => import('@/view/purchasing-help/information-feedback.vue')
       },
