@@ -49,7 +49,6 @@ export default [
     meta: {
       icon: 'logo-buffer',
       title: '销售人员自助',
-      hideInMenu: true,
     },
     component: Main,
     children: [
@@ -79,7 +78,6 @@ export default [
     meta: {
       icon: 'md-menu',
       title: '产品人员自助',
-      hideInMenu: true,
     },
     component: Main,
     children: [
