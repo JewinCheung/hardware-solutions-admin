@@ -57,7 +57,13 @@ export const productLine = {
       url: 'ProLine/GetProLine',
       method: 'get'
     })
-  }
+  },
+  getProLine () {
+    return axios.request({
+      url: 'ProLine/GetProLineByIsEnabled',
+      method: 'get'
+    })
+  },
 
 }
 

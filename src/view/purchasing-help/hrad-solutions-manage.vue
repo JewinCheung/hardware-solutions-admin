@@ -93,7 +93,7 @@ export default {
   methods: {
     getProLineData () {
       // 初始化产品线
-      productLine.getData().then(res => {
+      productLine.getProLine().then(res => {
         this.ProLine = res
       })
     },

@@ -106,7 +106,28 @@ namespace Pmis.Web.Api
         public async Task<List<dynamic>> GetProLine()
         {
             var data = BLLSession.IHard_BaseDictBLL.Query(u => u.DictType.Equals("产品线"));
-       
+
+            return await data.ToListAsync<dynamic>();
+        }
+
+        /// <summary>
+        /// 获取字典 产品线
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetProLineByIsEnabled")]
+        public async Task<List<dynamic>> GetProLineByIsEnabled()
+        {
+            var data = from a in BLLSession.IHard_BaseDictBLL.Query(u => u.DictType.Equals("产品线") && u.IsEnabled == 0)
+                       select new
+                       {
+                           a.DictNo,
+                           a.DictName,
+                           a.DictParam,
+                           a.Memo
+                       };
+
+
             return await data.ToListAsync<dynamic>();
         }
     }
