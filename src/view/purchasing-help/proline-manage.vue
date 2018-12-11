@@ -153,7 +153,10 @@ export default {
         this.proLineData.map(itme => {
           itme.IsEnabledBtn = itme.IsEnabled === 0
         })
-      })
+      });
+
+
+      
     },
 
     onRowClick (row, index) {
