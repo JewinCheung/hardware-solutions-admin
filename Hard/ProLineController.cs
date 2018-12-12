@@ -119,7 +119,8 @@ namespace Pmis.Web.Api
         public async Task<List<dynamic>> GetProLineByIsEnabled()
         {
             var data = from a in BLLSession.IHard_BaseDictBLL.Query(u => u.DictType.Equals("产品线") && u.IsEnabled == 0)
-                       select new
+                       orderby a.DictNo
+                       select new 
                        {
                            a.DictNo,
                            a.DictName,

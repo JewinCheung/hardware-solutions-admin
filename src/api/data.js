@@ -146,3 +146,46 @@ export const hardItem = {
   
 
 }
+
+export const solutions={
+
+  //获取产品线对应的硬件类目
+  getGroupProLine (id) {
+    return axios.request({
+      url: 'Solutions/GroupByProLine/'+id,
+      method: 'get'
+    })
+  },
+
+  ///保存产品线对应的硬件类目
+  setGroupProLine (id,data) {
+    return axios.request({
+      url: 'Solutions/AddSolutions/'+id,
+      data,
+      method: 'post'
+    })
+  },
+
+  //获取产品线对应的硬件类目下的硬件列表
+  getGroupItemData (ProLineNo,SubItemNo) {
+    const data = {
+      ProLineNo:ProLineNo, 
+      SubItemNo:SubItemNo
+    }
+    return axios.request({
+      url: 'Solutions/GetItemGroupByProLine',
+      params: data,
+      method: 'get'
+    })
+  },
+
+  //设置产品线对应的硬件类目下排除展示的硬件
+  setNotGroupItem (id,data) {
+    return axios.request({
+      url: 'Solutions/AddNotGroupByItem/'+id,
+      data,
+      method: 'post'
+    })
+  },
+
+}
