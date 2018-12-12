@@ -1,10 +1,8 @@
 ﻿using Pmis.Common;
 using Pmis.Model;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Script.Serialization;
@@ -32,9 +30,9 @@ namespace Pmis.Web.Api
             if (string.IsNullOrEmpty(SerialNo))
             {
                 var p_matObj = BLLSession.IHard_MaterialTypeBLL.Query(u => u.MatTypeNo.Equals(SubItemNo)).FirstOrDefault();
-                var c_matObj = BLLSession.IHard_MaterialItemBLL.Query(u => u.ItemNo.Equals(p_matObj.SerialNo)).OrderByDescending(u => u.MatTypeNo).FirstOrDefault();
+                var c_matObj = BLLSession.IHard_MaterialItemBLL.Query(u => u.SubItemNo.Equals(p_matObj.MatTypeNo)).OrderByDescending(u => u.ItemNo).FirstOrDefault();
                 entity.SerialNo = Guid.NewGuid().ToString();
-                entity.ItemNo = (c_matObj == null ? p_matObj.MatTypeNo + "0001" : (Convert.ToInt32(c_matObj.ItemNo) + 1).ToString());
+                entity.ItemNo = (c_matObj == null ? p_matObj.MatTypeNo + "0001" : (p_matObj.MatTypeNo.Remove(1) == "0" ? "0" : "") + (Convert.ToInt32(c_matObj.ItemNo) + 1).ToString());
                 entity.MatTypeNo = obj.MatTypeNo;
                 entity.SubItemNo = obj.SubItemNo;
                 entity.Brand = obj.Brand;

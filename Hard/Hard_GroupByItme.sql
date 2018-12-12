@@ -1,7 +1,7 @@
 USE [PmisDb]
 GO
 
-/****** Object:  Table [dbo].[Hard_GroupByItme]    Script Date: 2018/12/10 23:01:26 ******/
+/****** Object:  Table [dbo].[Hard_GroupByItme]    Script Date: 2018/12/13 3:47:22 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -11,6 +11,7 @@ GO
 CREATE TABLE [dbo].[Hard_GroupByItme](
 	[SerialNo] [nvarchar](50) NOT NULL,
 	[ProLineNo] [nvarchar](50) NULL,
+	[SubItemNo] [nvarchar](50) NULL,
 	[ItemNo] [nvarchar](50) NULL,
 	[CreateTime] [datetime] NULL,
 	[CreateUser] [int] NULL,

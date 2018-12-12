@@ -24,7 +24,7 @@ namespace Pmis.Web.Api
         {
             var ProLineNo = id;
 
-            var data = BLLSession.IHard_GroupByProLineBLL.Query(u => u.ProLineNo.Equals(ProLineNo));
+            var data = BLLSession.IHard_GroupByProLineBLL.Query(u => u.ProLineNo.Equals(ProLineNo)).OrderBy(u => u.GroupNo);
 
             return await data.ToListAsync<dynamic>();
         }
@@ -44,7 +44,7 @@ namespace Pmis.Web.Api
             //删除旧数据
             List<Hard_GroupByProLine> delList = BLLSession.IHard_GroupByProLineBLL.Query(u => u.ProLineNo.Equals(id)).ToList();
 
-            await BLLSession.DbSession.Hard_GroupByProLineRepository.DelEntitiesAsync(delList);
+            await BLLSession.DbSession.Hard_GroupByProLineRepository.DeleteEntitiesAsync(delList);
             //生成新数据
             List<Hard_GroupByProLine> applyDetails = obj;
             applyDetails.ForEach(u =>
@@ -58,9 +58,9 @@ namespace Pmis.Web.Api
             await BLLSession.DbSession.Hard_GroupByProLineRepository.AddEntitiesAsync(applyDetails);
 
 
-            var result = BLLSession.DbSession.SaveChanges() > 0 ? "" : "数据库操作失败";
+            int result = await BLLSession.DbSession.SaveChangesAsync();
 
-            if (string.IsNullOrEmpty(result))
+            if (result >= 0)
             {
                 return AjaxResult.OK("保存成功", obj);
             }
@@ -85,13 +85,20 @@ namespace Pmis.Web.Api
             var data = from a in BLLSession.IHard_GroupByProLineBLL.Query(u => u.ProLineNo.Equals(ProLineNo) && u.GroupNo.Equals(SubItemNo))
                        join b in BLLSession.IHard_MaterialItemBLL.Query(u => u.IsStop == 0)
                        on a.GroupNo equals b.SubItemNo
-                       where !GroupByItme.Any(u => u.ItemNo == b.ItemNo)
+                       join c in BLLSession.IHard_MaterialTypeBLL.Query(u => true)
+                        on b.MatTypeNo equals c.MatTypeNo
+                       join d in GroupByItme
+                       on b.ItemNo equals d.ItemNo into leftjoin
+                       from d in leftjoin.DefaultIfEmpty()
+                       orderby b.ItemNo
                        select new
                        {
-                           a.SerialNo,
-                           TypeNo = b.SerialNo,
+                           b.SerialNo,
+                           TypeNo = c.SerialNo,
+                           b.ItemNo,
                            b.MatTypeNo,
                            b.SubItemNo,
+                           c.MatTypeName,
                            SubType = a.GroupType,
                            b.Brand,
                            b.ItemModel,
@@ -107,6 +114,7 @@ namespace Pmis.Web.Api
                            b.LastTime,
                            b.DeliveryDay,
                            b.CreateTime,
+                           _checked = d == null ? true : false,
                        };
 
 
@@ -125,12 +133,14 @@ namespace Pmis.Web.Api
         [Route("AddNotGroupByItem/{id}")]
         public async Task<AjaxResult> AddNotGroupByItem(string id, List<Hard_GroupByItme> obj)
         {
-            string ProLineNo = id;
+            var  param = id.Split(',');
 
+            string ProLineNo = param[0];
+            string SubItemNo = param[1];
             //删除旧数据
-            List<Hard_GroupByItme> delList = BLLSession.IHard_GroupByItmeBLL.Query(u => u.ProLineNo.Equals(id)).ToList();
+            List<Hard_GroupByItme> delList = BLLSession.IHard_GroupByItmeBLL.Query(u => u.ProLineNo.Equals(ProLineNo) &&u.SubItemNo.Equals(SubItemNo)).ToList();
 
-            await BLLSession.DbSession.Hard_GroupByItmeRepository.DelEntitiesAsync(delList);
+            await BLLSession.DbSession.Hard_GroupByItmeRepository.DeleteEntitiesAsync(delList);
             //生成新数据
             List<Hard_GroupByItme> applyDetails = obj;
             applyDetails.ForEach(u =>
@@ -144,7 +154,7 @@ namespace Pmis.Web.Api
             await BLLSession.DbSession.Hard_GroupByItmeRepository.AddEntitiesAsync(applyDetails);
 
 
-            var result = BLLSession.DbSession.SaveChanges() > 0 ? "" : "数据库操作失败";
+            var result = await BLLSession.DbSession.SaveChangesAsync() >= 0 ? "" : "数据库操作失败";
 
             if (string.IsNullOrEmpty(result))
             {
