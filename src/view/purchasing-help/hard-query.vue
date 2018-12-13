@@ -9,76 +9,143 @@
       </div>
       <div class="tag-nav-line">
         产品线：
-        <Tag v-for="item in ProLine" :key="item" :name="item" :color="item === tag_name ? 'primary' : 'default'"
-          @click.native="tagClick(item)">{{ item}}</Tag>
+        <Tag v-for="item in ProLine" :key="item.DictNo" :name="item.DictName" :color="item.DictName === tag_name ? 'primary' : 'default'"
+          @click.native="tagClick(item)">{{ item.DictName}}</Tag>
       </div>
       <div class="tag-nav-line">
         硬件分类：
-        <Select v-model="bigType" style="width:160px" @on-change="getSmall">
-          <Option v-for="item in HardType" :value="item.bigType" :key="item.bigType">{{ item.bigType }}</Option>
+        <Select v-model="bigTypeNo" style="width:160px" @on-change="getSmall">
+          <Option v-for="item in hardTypeData" :value="item.SerialNo" :key="item.SerialNo">{{ item.MatTypeName }}</Option>
         </Select>
-        <Tag v-for="item in smallType" :key="`tag-nav-${item}`" :name="item" color="default" @click.native="tagAdd(item)">{{
-          item }}</Tag>
+        <Tag v-for="item in smallType" :key="item.SerialNo" :name="item.MatTypeName" color="default" @click.native="tagAdd(item.MatTypeName)">{{
+          item.MatTypeName }}</Tag>
       </div>
-      <div>
+      <div style="height:22px;margin: 5px 0 5px 0;">
         <Tag closable v-for="item in tagCount" :key="item" :name="item.title" color="warning" @on-close="tagClose(item)">{{
           item}}</Tag>
       </div>
-      <Table :data="hardList" :columns="hardColumns" stripe ref="tables"></Table>
+
+      <Table :data="hardItmeList" :columns="ItmeColumns" stripe ref="tables" height="480"></Table>
       <div style="margin: 10px;overflow: hidden">
         <Button type="primary" size="large" @click="exportData()">
           <Icon type="ios-download-outline"></Icon>导出
         </Button>
         <div style="float: right;">
-          <Page :total="1" :current="1" @on-change="changePage"></Page>
+          <Page :total="page.total" :page-size="page.PageSize" :current="page.current" @on-change="changePage"
+            @on-page-size-change="changePageSize" show-sizer show-total></Page>
         </div>
       </div>
     </Card>
+
+    <Modal v-model="itemConfig_Modal" width="60%">
+      <p slot="header" style="text-align:center">
+        <span>{{titleName.name}}</span>
+      </p>
+      <div>
+        <Form ref="configformValidate" :label-width="120">
+          <FormItem v-for="item in configData" :key="item.SerialNo" :label="item.ItmeName+'：'">
+            <Radio v-model="Radio">{{item.SubItmeName}}</Radio>
+          </FormItem>
+        </Form>
+      </div>
+      <div slot="footer">
+        <Button @click="itemConfig_Modal=false" style="margin-left: 8px">关闭</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
-  import Tables from '_c/tables'
   import {
-    getProLine,
-    getHardType,
-    getHardList
+    productLine,
+    hardType,
+    hardItem
   } from '@/api/data'
   export default {
     name: 'purchasing-hard-query',
-    components: {
-      Tables
-    },
+
     data() {
       return {
         searchValue: '',
         ProLine: [], // 产品线
-        HardType: [], // 硬件分类
-        smallType: [], // 硬件小类
+        hardTypeData: [], //大类数据
+        bigTypeNo: '', // 默认大类
+        smallType: [], // 小类数据
         tag_name: 'default', // 默认标签
-        bigType: '', // 模式大类
         tagCount: [],
-        hardList: [],
-        hardColumns: []
+        hardItmeList: [], //硬件列表
+        ItmeColumns: [], // 硬件列表展示字段
+
+        Radio: true,
+        configData: [{
+          SerialNo: '',
+          ItmeName: '',
+          SubItmeName: ''
+        }],
+        onSelect: {
+          // 当前选中行
+          index: 0,
+          row: null
+        },
+        itemConfig_Modal: false, // 硬件配置弹出框
+        titleName: {
+          // 弹出框展现信息
+          // 弹出框熟悉
+          id: '', // big small  config item
+          name: '', // title
+          type: '' // add edit
+        },
+        page: { //表单分页
+          total: 1,
+          current: 1,
+          PageSize: 10,
+          key: '',
+        }
+
       }
     },
-    methods: {
-      // 切换硬件小分类
-      getsmallType() {
-        const bigTypeName = this.bigType
+    mounted() {
+      // 初始化产品线
+      productLine.getProLine().then(res => {
+        this.ProLine = res
 
-        const HardType = this.HardType.filter(item => {
-          return item.bigType === bigTypeName
+        const Line = this.ProLine[0];
+        this.tag_name = Line.DictName;
+         this.tagCount.push(Line.DictName);
+          this.handleSearch();
+      })
+      //获取硬件分类
+      hardType.getHardType().then(res => {
+        this.hardTypeData = res.Data
+      })
+
+      this.sethardColumns()
+
+     
+    },
+    methods: {
+      // 硬件大分类选择事件
+      getSmall(Option) {
+        this.bigType = Option
+        this.smallType = []
+        this.getsmallType()
+      },
+      // 大类切换 加载小分类
+      getsmallType() {
+        const SerialNo = this.bigTypeNo
+
+        const HardType = this.hardTypeData.filter(item => {
+          return item.SerialNo === SerialNo
         })
 
         setTimeout(() => {
-          this.smallType = HardType[0].smallType
+          this.smallType = HardType[0].smallType ? HardType[0].smallType : []
         }, 300)
       },
       // 标签点击事件
       tagClick(name) {
-        this.tag_name = name
-        this.tagAdd(name)
+        this.tag_name = name.DictName
+        this.tagAdd(name.DictName)
       },
       // 添加标签
       tagAdd(name) {
@@ -92,88 +159,132 @@
         const index = this.tagCount.indexOf(name)
         this.tagCount.splice(index, 1)
       },
-      // 硬件大分类选择事件
-      getSmall(Option) {
-        this.bigType = Option
-        this.smallType = []
-        this.getsmallType()
+      getItemData() {
+        hardItem
+          .getItemDatabySearch({
+            PageIndex: this.page.current,
+            PageSize: this.page.PageSize,
+            QueryKey: this.page.key
+          })
+          .then(res => {
+            console.log(res)
+            var data = res.Data
+            this.hardItmeList = data.rows.map(item => {
+              if (item.ConfigDesc) {
+
+                item.ConfigDesc = JSON.parse(item.ConfigDesc);
+              } else {
+                item.ConfigDesc = [];
+
+              }
+              return item;
+            });
+            this.page.total = data.total
+          })
       },
-      changePage() {},
+      handleSearch() {
+        if (this.searchValue.length > 0) {
+          this.tagAdd(this.searchValue)
+        }
+        this.page.current = 1;
+        this.page.PageSize = 10
+        this.page.key = JSON.stringify(this.tagCount);
+        this.getItemData();
+        console.log(JSON.stringify(this.tagCount))
+
+
+      },
       sethardColumns() {
-        this.hardColumns = [{
+        this.ItmeColumns = [        {
             title: '产品线',
-            key: 'proLineName'
+            key: 'DictName',
+            sortable: true,
+            width: 100,
+            fixed: 'left'
           },
           {
             title: '大类',
-            key: 'bigType'
+            key: 'MatTypeName',
+            sortable: true,
+            width: 100,
+            fixed: 'left'
           },
           {
             title: '子类',
-            key: 'smallType'
+            key: 'SubType',
+            sortable: true,
+            width: 100,
+            fixed: 'left'
           },
           {
             title: '品牌',
-            key: 'hardBrand'
+            key: 'Brand',
+            width: 100,
+            sortable: true,
+            fixed: 'left'
           },
           {
             title: '型号',
-            key: 'hardModel',
+            key: 'ItemModel',
+            width: 100,
+            fixed: 'left',
             tooltip: true
           },
           {
             title: '参数',
-            key: 'hardParams',
+            key: 'ConfigDesc',
+            fixed: 'left',
+            width: 80,
             render: (h, params) => {
-              return h(
-                'tooltip', {
+              return h('tooltip', [
+                h('Icon', {
                   props: {
-                    placement: 'top'
+                    type: this.hardItmeList[params.index].ConfigDesc.length > 0 ?
+                      'ios-eye' :
+                      '',
+                    size: this.hardItmeList[params.index].ConfigDesc.length > 0 ?
+                      '24' :
+                      '24'
+                  },
+                  on: {
+                    click: () => {
+                      this.onSelect.row = params.row
+                      this.getItemConfig()
+                    }
                   }
-                },
-                [
-                  h('Tag', '···'),
-                  h(
-                    'div', {
-                      slot: 'content'
-                    },
-                    [
-                      h(
-                        'ul',
-                        this.hardList[params.index].hardParams.map(item => {
-                          return h(
-                            'li', {
-                              style: {
-                                textAlign: 'left',
-                                padding: '4px',
-                                'list-style-type': 'none'
-                              }
-                            },
-                            item.dictType + '：' + item.dictName
-                          )
-                        })
-                      )
-                    ]
-                  )
-                ]
-              )
+                }),
+                h(
+                  'div', {
+                    slot: 'content'
+                  },
+                  this.hardItmeList[params.index].ConfigDesc.length > 0 ?
+                  '点击查看/编辑' :
+                  '点击设置'
+                )
+              ])
             }
           },
           {
-            title: '质保',
-            key: 'hardWarranty',
-            width: 60,
-            align: 'center'
+            title: '质保期限',
+            key: 'WarrantyPeriod',
+            width: 100,
+            align: 'center',
+            render: (h, params) => {
+              const text = params.row.WarrantyPeriod ?
+                params.row.WarrantyPeriod + '/年' :
+                ''
+              return h('div', text)
+            }
           },
           {
-            title: '质保类型',
+            title: '质保方式',
             key: 'warrantyType',
             width: 90,
             align: 'center'
           },
           {
             title: '延保费用',
-            key: 'warrantyPrice',
+            key: 'WarrantyCost',
             width: 90,
             align: 'center'
           },
@@ -184,10 +295,11 @@
             align: 'center',
             render: (h, params) => {
               return h('tooltip', [
-
                 h('Icon', {
                   props: {
-                    type: this.hardList[params.index].hardImg.length > 0 ? 'ios-eye' : '',
+                    type: this.hardItmeList[params.index].AttachFiles ?
+                      'ios-eye' :
+                      '',
                     size: '24'
                   },
                   style: {},
@@ -202,7 +314,9 @@
                   'div', {
                     slot: 'content'
                   },
-                  this.hardList[params.index].hardImg.length > 0 ? '点击预览' : '无图片信息'
+                  this.hardItmeList[params.index].AttachFiles ?
+                  '点击预览' :
+                  '无图片信息'
                 )
               ])
             }
@@ -215,32 +329,74 @@
             render: (h, params) => {
               const row = params.row
               const text = row.IsEnergy === 1 ? '是' : '否'
-              return h('Tag', text)
+              return h('div', text)
             }
           },
           {
-            title: '价格',
-            key: 'hardPrice'
+            title: '采购价',
+            width: 90,
+            key: 'PurchasePrice',
+            align: 'center'
+          },
+          {
+            title: '建议价',
+            width: 90,
+            key: 'Offer',
+            align: 'center'
+          },
+          {
+            title: '周期',
+            key: 'DeliveryDay',
+            width: 90,
+            align: 'center',
+            render: (h, params) => {
+              const text = params.row.DeliveryDay ?
+                params.row.DeliveryDay + '/工作日' :
+                ''
+              return h('div', text)
+            }
           },
           {
             title: '更新日期',
-            key: 'CreateTime',
-            width: 100
+            key: 'LastTime',
+            minWidth: 110,
+            sortable: true
           }
         ]
       },
+      // 查看硬件配置
+      getItemConfig() {
+        if (!this.onSelect.row) {
+          this.$Message.error('请选择行！')
+          return
+        }
+        let rows = this.onSelect.row
+
+        this.configData = []
+        this.titleName.name =
+          '[' + rows.SubType + '-' + rows.ItemModel + ']配置硬件信息'
+        let ConfigDesc = this.onSelect.row.ConfigDesc
+
+        if (ConfigDesc) {
+          this.configData = ConfigDesc
+          console.log(this.configData)
+        }
+        this.itemConfig_Modal = true
+      },
       show(index) {
-        if (this.hardList[index].hardImg.length > 0) {
+        if (this.hardItmeList[index].AttachFiles) {
+          var AttachFiles = JSON.parse(this.hardItmeList[index].AttachFiles)
+
           this.$Modal.info({
             scrollable: true,
             closable: true,
             render: h => {
               return h(
                 'div',
-                this.hardList[index].hardImg.map(item => {
+                AttachFiles.map(item => {
                   return h('img', {
                     attrs: {
-                      src: item
+                      src: item.url
                     },
                     style: {
                       width: '100%'
@@ -252,31 +408,14 @@
           })
         }
       },
-      handleSearch() {
-        if (this.searchValue.length > 0) {
-          this.tagAdd(this.searchValue)
-        }
-        // 硬件列表
-        getHardList().then(res => {
-          this.hardList = res.data
-          if (this.tagCount.length > 0) {
-            this.hardList = this.hardList.filter(item => {
-              var isOk = false
-              this.tagCount.map(i => {
-                if (
-                  item.proLineName.indexOf(i) > -1 ||
-                  item.bigType.indexOf(i) > -1 ||
-                  item.smallType.indexOf(i) > -1
-                ) {
-                  return (isOk = true)
-                }
-              })
-              if (isOk) {
-                return item
-              }
-            })
-          }
-        })
+      //分页事件
+      changePage(value) {
+        this.page.current = value
+        this.getItemData()
+      },
+      changePageSize(value) {
+        this.page.PageSize = value
+        this.getItemData()
       },
       exportData() {
         this.$refs.tables.exportCsv({
@@ -286,25 +425,8 @@
         })
 
       }
-    },
-    mounted() {
-      // 初始化产品线
-      getProLine().then(res => {
-        this.ProLine = res.data
-        // const Line = this.ProLine[0];
-        // this.tag_name = Line;
-        // this.tagClick(Line);
-      })
-      // 初始化硬件分类
-      getHardType().then(res => {
-        this.HardType = res.data
-        this.bigType = this.HardType[0].bigType
-        this.getsmallType()
-      })
-      // 硬件列表
-      this.sethardColumns()
-      this.handleSearch()
     }
+
   }
 
 </script>

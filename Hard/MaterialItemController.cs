@@ -107,7 +107,7 @@ namespace Pmis.Web.Api
         }
 
         /// <summary>
-        /// 查询-硬件列表
+        /// 获取所有硬件信息
         /// </summary>
         /// <param name="page"></param>
         /// <returns></returns>
@@ -148,12 +148,94 @@ namespace Pmis.Web.Api
             if (!string.IsNullOrEmpty(page.QueryKey))
             {
                 string[] list = new JavaScriptSerializer().Deserialize<string[]>(page.QueryKey);
-                if (list.Length > 0) {
+                if (list.Length > 0)
+                {
                     data = data.Where(u => list.Contains(u.MatTypeName) || list.Contains(u.SubType) || list.Contains(u.Brand) || list.Contains(u.ItemModel));
                 }
-                 
+
             }
-          
+
+            //查询条件
+            //data = supplyList.WhereIf(!string.IsNullOrEmpty(page.QueryKey), u => u.PoNo.Contains(page.QueryKey)); new LinqPage(page.PageIndex, page.PageSize, page.Order, page.Sort)
+            return AjaxResult.ToJSON(new { total = data.Count(), rows = await data.PageResult(GetLinqPage(page.PageIndex, page.PageSize, "CreateTime", "desc")).ToListAsync<dynamic>() });
+
+        }
+
+
+        /// <summary>
+        /// 查询硬件信息
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("SearchItem")]
+        public async Task<AjaxResult> SearchItemData([FromUri]PageResult page)
+        {
+
+            var GroupByItme = BLLSession.IHard_GroupByItmeBLL.Query(u => true);
+            var data = from a in BLLSession.IHard_GroupByProLineBLL.Query(u => true)
+                       join dict in BLLSession.IHard_BaseDictBLL.Query(u => true)
+                       on a.ProLineNo equals dict.DictNo
+                       join b in BLLSession.IHard_MaterialItemBLL.Query(u => u.IsStop == 0)
+                       on a.GroupNo equals b.SubItemNo
+                       join c in BLLSession.IHard_MaterialTypeBLL.Query(u => true)
+                        on b.MatTypeNo equals c.MatTypeNo
+                       where !GroupByItme.Any(i => i.ItemNo == b.ItemNo)
+                       orderby b.ItemNo
+                       select new
+                       {
+                           b.SerialNo,
+                           TypeNo = c.SerialNo,
+                           dict.DictName,
+                           b.ItemNo,
+                           b.MatTypeNo,
+                           b.SubItemNo,
+                           c.MatTypeName,
+                           SubType = a.GroupType,
+                           b.Brand,
+                           b.ItemModel,
+                           b.ConfigDesc,
+                           b.AttachFiles,
+                           b.WarrantyPeriod,
+                           b.warrantyType,
+                           b.WarrantyCost,
+                           b.PurchasePrice,
+                           b.Offer,
+                           b.IsStop,
+                           b.IsEnergy,
+                           b.LastTime,
+                           b.DeliveryDay,
+                           b.CreateTime,
+                       };
+            if (!string.IsNullOrEmpty(page.QueryKey))
+            {
+                string[] list = new JavaScriptSerializer().Deserialize<string[]>(page.QueryKey);
+                if (list.Length > 0)
+                {
+                    var LineData = data.Where(u => list.Contains(u.DictName));
+                    var cont = LineData.GroupBy(u => new { u.DictName }).Select(u => new { DictName = u.Key.DictName });
+                    
+                    if (LineData.Count() > 0)
+                    {
+                        if (list.Length==cont.Count())
+                        {
+                            data = LineData.Where(u => list.Contains(u.DictName));
+                        }
+                        else if(list.Length> cont.Count())
+                        {
+                            data = LineData.Where(u => list.Contains(u.DictName) && (list.Contains(u.MatTypeName) || list.Contains(u.SubType) || list.Contains(u.Brand) || list.Contains(u.ItemModel)));
+                        }
+
+                    }
+                    else
+                    {
+                        data = data.Where(u => list.Contains(u.MatTypeName) || list.Contains(u.SubType) || list.Contains(u.Brand) || list.Contains(u.ItemModel));
+                    }
+
+                }
+
+            }
+
             //查询条件
             //data = supplyList.WhereIf(!string.IsNullOrEmpty(page.QueryKey), u => u.PoNo.Contains(page.QueryKey)); new LinqPage(page.PageIndex, page.PageSize, page.Order, page.Sort)
             return AjaxResult.ToJSON(new { total = data.Count(), rows = await data.PageResult(GetLinqPage(page.PageIndex, page.PageSize, "CreateTime", "desc")).ToListAsync<dynamic>() });

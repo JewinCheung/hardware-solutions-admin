@@ -135,7 +135,16 @@ export const hardItem = {
       method: 'get'
     })
   },
-
+  getItemDatabySearch ({PageIndex, PageSize,QueryKey}) {
+    const data = {
+      PageIndex, PageSize,QueryKey
+    }
+    return axios.request({
+      url: 'MaterialItem/SearchItem',
+      params: data,
+      method: 'get'
+    })
+  },
   setConfig (data) {
     return axios.request({
       url: 'MaterialItem/SetConfig',

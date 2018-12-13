@@ -44,7 +44,7 @@ namespace Pmis.Web.Api
             //删除旧数据
             List<Hard_GroupByProLine> delList = BLLSession.IHard_GroupByProLineBLL.Query(u => u.ProLineNo.Equals(id)).ToList();
 
-            await BLLSession.DbSession.Hard_GroupByProLineRepository.DeleteEntitiesAsync(delList);
+            await BLLSession.DbSession.Hard_GroupByProLineRepository.DelEntitiesAsync(delList);
             //生成新数据
             List<Hard_GroupByProLine> applyDetails = obj;
             applyDetails.ForEach(u =>
@@ -140,7 +140,7 @@ namespace Pmis.Web.Api
             //删除旧数据
             List<Hard_GroupByItme> delList = BLLSession.IHard_GroupByItmeBLL.Query(u => u.ProLineNo.Equals(ProLineNo) &&u.SubItemNo.Equals(SubItemNo)).ToList();
 
-            await BLLSession.DbSession.Hard_GroupByItmeRepository.DeleteEntitiesAsync(delList);
+            await BLLSession.DbSession.Hard_GroupByItmeRepository.DelEntitiesAsync(delList);
             //生成新数据
             List<Hard_GroupByItme> applyDetails = obj;
             applyDetails.ForEach(u =>

@@ -116,8 +116,8 @@ export default [
         name: 'purchasing-hard-query',
         meta: {
           icon: 'md-trending-up',
-          title: '采购-硬件库查询',
-          hideInMenu: true,
+          title: '硬件库查询',
+          // hideInMenu: true,
         },
         component: () => import('@/view/purchasing-help/hard-query.vue')
       },
@@ -126,8 +126,8 @@ export default [
         name: 'purchasing-information-feedback',
         meta: {
           icon: 'md-grid',
-          title: '采购-现场信息反馈',
-          hideInMenu: true,
+          title: '现场信息反馈',
+          // hideInMenu: true,
         },
         component: () => import('@/view/purchasing-help/information-feedback.vue')
       },
