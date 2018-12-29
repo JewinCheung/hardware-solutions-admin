@@ -1,6 +1,6 @@
 import { login, getUserInfo } from '@/api/user'
 import { setToken, getToken } from '@/libs/util'
-
+import { resData } from '@/libs/tools'
 export default {
   state: {
     account: '',
@@ -37,11 +37,21 @@ export default {
           account,
           passwd
         }).then(res => {
-          const data = res.Data
-          console.log(res)
-          console.log(data)
-          commit('setToken', data)
-          resolve()
+            console.log(res)
+          resData(
+            res,
+            res => {
+              const data = res.Data
+              console.log(res)
+              console.log(data)
+              commit('setToken', data)
+             
+            },
+            res => {
+           
+            }
+          )
+          resolve(res)
         }).catch(err => {
           reject(err)
         })
@@ -67,13 +77,16 @@ export default {
     getUserInfo ({commit}) {
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
-          const data = res
+
+          const data = res.Data.info
+          console.log(res.Data.info);
+          console.log(res.Data.Access);
           // console.log(data)
           // commit('setAvator', data.avator)
           commit('setUserName', data.UserName)
           // commit('setUserId', data.user_id)
-          commit('setAccess', ['admin'])
-          resolve(data)
+          commit('setAccess',res.Data.Access)
+          resolve(res)
         }).catch(err => {
           reject(err)
         })

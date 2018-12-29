@@ -28,7 +28,7 @@ export default [
     component: Main,
     meta: {
       hideInMenu: true,
-      notCache: true
+      notCache: true,
     },
     children: [
       {
@@ -37,7 +37,7 @@ export default [
         meta: {
           hideInMenu: true,
           title: '首页',
-          notCache: true
+          notCache: true,
         },
         component: () => import('@/view/single-page/home')
       }
@@ -49,6 +49,7 @@ export default [
     meta: {
       icon: 'logo-buffer',
       title: '销售人员自助',
+      access: ['admin','sales'] 
     },
     component: Main,
     children: [
@@ -78,6 +79,7 @@ export default [
     meta: {
       icon: 'md-menu',
       title: '产品人员自助',
+      access: ['admin','product'] 
     },
     component: Main,
     children: [
@@ -107,7 +109,8 @@ export default [
     name: 'purchasing-help',
     meta: {
       icon: 'md-menu',
-      title: '采购人员自助'
+      title: '采购人员自助',
+      access: ['admin','purchasing'] 
     },
     component: Main,
     children: [
